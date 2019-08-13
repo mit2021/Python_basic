@@ -818,11 +818,72 @@ datetime.timezone	Python 3.2中新增的功能，实现tzinfo抽象基类的类�
 
 5.http请求
 安装Requests库
+httplib是一个相对底层的http请求模块，urlib就是基于httplib封装的。简单使用如下：
+get请求	
+import httplib
+conn = httplib.HTTPConnection("www.python.org")
+conn.request("GET", "/index.html")
+r1 = conn.getresponse()
+print r1.status, r1.reason
+data1 = r1.read()
+conn.request("GET", "/parrot.spam")
+r2 = conn.getresponse()
+data2 = r2.read()
+conn.close()
 
-GET请求
 
-POST请求 
 
-响应码code和响应头headers的处理
+post请求：
+	
+import httplib, urllib
+params = urllib.urlencode({'@number': 12524, '@type': 'issue', '@action': 'show'})
+headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+conn = httplib.HTTPConnection("bugs.python.org")
+conn.request("POST", "", params, headers)
+response = conn.getresponse()
+data = response.read()
+print data
+conn.close()
 
-请求超时设置
+
+
+
+#第三方库-requests
+
+#发请get请求：	
+print requests.get('http://localhost:8080).text
+
+#post请求
+payload = {'key1': 'value1', 'key2': 'value2'}
+r = requests.post("http://httpbin.org/post", data=payload)
+print r.text
+
+
+
+#响应码code和响应头headers的处理
+请求头headers处理：在Requests的get函数中添加headers参数
+    import requests
+     user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5;windows NT'
+     headers = {'User-Agent':user_agent}
+     r = requests.get('http://www.baidu.com',headers=headers)
+     print('content----→'+str(r.content))
+
+  响应码code和响应头headers处理
+      import requests
+        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5;windows NT'
+        headers = {'User-Agent':user_agent}
+        r = requests.get('http://www.baidu.com',headers=headers)
+
+       if r.status_code == requests.codes.ok:
+             print(r.status_code) #响应码
+             print(r.headers) #响应头
+             print(r.headers.get('content-type'))#获取响应头的某个字段（推荐）
+       else:
+              r.raise_for_status()
+Note：raise_for_status()函数是用来主动地产生一个异常，当响应码是4XX或5XX时，raise_for_status()函数会抛出异常，而响应码为200时，raise_for_status()函数返回None
+#请求超时设置
+import urllib2
+request=urllib2.Request('http://www.zhihu.com')
+response = urllib2.urlopen(request,timeout=2)
+html=response.read()
+print html
